@@ -7,6 +7,56 @@ import pandas as pd
 import cv2
 import math
 from random import randint
+import h5py
+
+
+def load_dataset_from_hdf5_file(hdf_file_path):
+    try:
+        with h5py.File(hdf_file_path, "r") as hf:
+            trainX = np.array(hf["trainX"]).astype("float64")
+            trainY = np.array(hf["trainY"]).astype("int")
+            devX = np.array(hf["devX"]).astype("float64")
+            devY = np.array(hf["devY"]).astype("int")
+            testX = np.array(hf["testX"]).astype("float64")
+            testY = np.array(hf["testY"]).astype("int")
+
+            ascii_train_labels = np.array(hf["trainLabels"]).astype("S65")
+            ascii_dev_labels = np.array(hf["devLabels"]).astype("S65")
+            ascii_test_labels = np.array(hf["testLabels"]).astype("S65")
+
+            trainLabels = np.array(
+                [n.decode("unicode_escape") for n in ascii_train_labels]
+            )
+            devLabels = np.array([n.decode("unicode_escape") for n in ascii_dev_labels])
+            testLabels = np.array(
+                [n.decode("unicode_escape") for n in ascii_test_labels]
+            )
+
+        print(f"trainX.shape: {trainX.shape}")
+        print(f"trainY.shape: {trainY.shape}")
+        print(f"trainLabels.shape: {trainLabels.shape}")
+        print(f"devX.shape: {devX.shape}")
+        print(f"devY.shape: {devY.shape}")
+        print(f"devLabels.shape: {devLabels.shape}")
+        print(f"testX.shape: {testX.shape}")
+        print(f"testY.shape: {testY.shape}")
+        print(f"testLabels.shape: {testLabels.shape}")
+
+        return (
+            trainX,
+            trainY,
+            trainLabels,
+            devX,
+            devY,
+            devLabels,
+            testX,
+            testY,
+            testLabels,
+        )
+
+    except Exception as e:
+        print(f"An error occurred while loading the HDF5 file: {e}")
+        raise
 
 
 def load_rgb_data(IMAGE_DIRECTORY, IMAGE_SIZE, shuffle=True):
